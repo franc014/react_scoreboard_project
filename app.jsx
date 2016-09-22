@@ -51,6 +51,7 @@ function Header(props) {
     <div className="header">
       <Statistics players={props.players}/>
       <h1>{props.title}</h1>
+      <Stopwatch />
     </div>
   );
 }
@@ -131,6 +132,67 @@ var AddPlayerForm = React.createClass(
     }
   
   
+  });
+  
+  
+  
+  
+  var Stopwatch = React.createClass({
+    getInitialState:function(){
+        return {
+          running:false,
+          elapsedTime:0,
+          previousTime:0
+        }
+    },
+    onStart:function(){
+      this.state.running = true;
+      this.state.previousTime = Date.now();
+      this.setState(this.state);
+    },
+    onStop:function(){
+      this.state.running = false;
+      this.setState(this.state);
+    },
+    onReset:function(){
+      this.setState({
+        elapsedTime:0,
+        previousTime:Date.now()
+      });
+    },
+  
+    componentDidMount: function(){
+      this.interval = setInterval(this.onTick,100);
+    },
+  
+    componentWillUnmount: function(){
+      clearInterval(this.interval);
+    },
+    onTick:function(){
+      if(this.state.running){
+        var now = Date.now();
+        
+        this.setState({
+          previousTime : now,
+          elapsedTime : this.state.elapsedTime + (now - this.state.previousTime)
+        });
+      }
+      
+  
+    },
+    render:function(){
+      var seconds = Math.floor(this.state.elapsedTime / 1000);
+      
+      return (
+        <div className="stopwatch">
+          <h2>Stopwatch</h2>
+          <div className="stopwatch-time">{seconds}</div>
+          {this.state.running ? <button onClick={this.onStop} >Stop</button> : <button onClick={this.onStart}>Start</button>}
+          <button onClick={this.onReset}>Reset</button>
+        </div>
+  
+      )
+    }
   });
   
   
